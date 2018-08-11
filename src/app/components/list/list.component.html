@@ -1,0 +1,97 @@
+<header></header>
+<div class="container">
+  <div class="container-popup" *ngIf="showUploadPopup">
+    <form class="form">
+      <div class="form-group">
+        <label class="control-label">上传文件：</label>
+        <input type="file" (change)="onFilesChange($event)" />
+      </div>
+      <div class="form-group">
+        <label class="control-label">文件名：&emsp;</label>
+        <input type="text" placeholder="要自定义的文件名" (keyup)="onFileNameChange($event)" />
+      </div>
+      <div class="form-group">
+        <label class="control-label">文件类型：</label>
+        <select (change)="onHelpTypeChange($event)">
+          <option value="EmergencyPlan">应急预案</option>
+          <option value="Standard">规范</option>
+          <option value="ExperienceSharing">经验分享</option>
+        </select>
+      </div>
+      <div class="form-group form-group-btns">
+        <button class="btn btn-outline-info" (click)="upload()">&emsp;提交&emsp;</button>
+        <button class="btn btn-outline-light" (click)="hideUploadPopup()">&emsp;取消&emsp;</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="container-popup pdf" *ngIf="showScanPopup">
+    <span class="pull-right" (click)="hideScanWindow()">×</span>
+    <iframe [src]="iframeSrc"></iframe>
+  </div>
+  
+
+  <div class="row">
+    <nav class="navbar navbar-light col-sm-12">
+      <form class="form-inline">
+        <input class="form-control mr-sm-2" type="text" placeholder="请输入文件名" />
+        <button class="btn btn-primary mr-sm-2">查找</button>
+      </form>
+      <button class="btn btn-primary" (click)="showPopupWindow()">上传文件</button>
+    </nav>
+  </div>
+  
+  <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+        <th style="width: 5px"></th>
+        <th>名称</th>
+        <th>格式</th>
+        <th>大小（M）</th>
+        <th>路径</th>
+        <th>类型</th>
+        <th style="width: 100px">操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let record of records">
+        <td><input type="checkbox" class="input-checkbox" /></td>
+        <td>{{record.fileName}}</td>
+        <td>{{record.fileType}}</td>
+        <td>{{record.fileSize}}</td>
+        <td>{{record.filePath}}</td>
+        <td>{{record.helpType}}</td>
+        <td>
+          <a href="javascript:;" (click)="showScanWindow(record.id)">预览</a>
+          <a href="javascript:;" (click)="delete(record.id)">删除</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <nav>
+    <span id="counts-record" class="pull-left">
+      查询到{{sum}}条数据，当前显示{{currentCounts}}条
+    </span>
+    <ul class="pagination pull-right">
+      <li class="page-item">
+        <a class="page-link" href="javascript:;" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+          <span class="sr-only">Previous</span>
+        </a>
+      </li>
+      <li class="page-item"><a class="page-link" href="javascript:;">1</a></li>
+      <li class="page-item">
+        <a class="page-link" href="javascript:;" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+          <span class="sr-only">Next</span>
+        </a>
+      </li>
+      <span id="page-goto">
+        跳到
+        <input id="page-index" class="form-control" type="number" min="1" /> 
+        页
+      </span>
+    </ul>
+  </nav>
+</div>

@@ -5,7 +5,8 @@
   "angular-cli": {},
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --env=dev --proxy-config proxy.conf.json -o",
+    "build": "ng build --prod",
     "test": "ng test",
     "pree2e": "webdriver-manager update --standalone false --gecko false",
     "e2e": "protractor"
@@ -20,7 +21,10 @@
     "@angular/platform-browser": "^2.3.1",
     "@angular/platform-browser-dynamic": "^2.3.1",
     "@angular/router": "^3.3.1",
+    "bootstrap": "^4.1.3",
     "core-js": "^2.4.1",
+    "font-awesome": "^4.7.0",
+    "ionicons": "^4.3.0",
     "rxjs": "^5.0.1",
     "ts-helpers": "^1.1.1",
     "zone.js": "^0.7.2"
