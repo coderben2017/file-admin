@@ -14,6 +14,10 @@
   margin: 0 auto;
 }
 
+.nav-header {
+  width: 100%;
+}
+
 .form-group-btns {
   text-align: center;
 }
@@ -23,7 +27,7 @@
   height: 90%;
   left: 15%;
   top: 5%;
-  padding-top: 0;
+  padding: 4px 6px;
 }
 .pdf span {
   height: 24px;
@@ -32,6 +36,9 @@
   cursor: pointer;
   margin-bottom: 10px;
   margin-right: 10px;
+}
+.pdf > span.pull-left {
+  font-size: 16px;
 }
 .pdf iframe {
   width: 100%;

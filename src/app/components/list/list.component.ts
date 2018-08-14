@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ListService } from '../../services/list.service';
-import { Record } from '../../data/file';
 import { environment } from '../../../environments/environment';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-list',
@@ -10,22 +10,33 @@ import { environment } from '../../../environments/environment';
 })
 export class ListComponent implements OnInit {
 
+  // 文件上传&下载表单项
   files: FileList;
   fileName: string;
   helpType: string;
 
+  // 弹窗显示&隐藏控制变量
   showUploadPopup: boolean;
   showScanPopup: boolean;
 
+  // 接收的文件列表
   sum: number;
   pageSize: number;
   currentCounts: number;
-  records: Record[];
+  records: any[];
 
-  iframeSrc: string;
+  // iframe中文档路径
+  iframeSrc: SafeUrl;
   apiUrl: string;
+  downloadSrc: string;
 
-  constructor(private listService: ListService) { }
+  // 选中的记录的id数组，用于批量删除
+  selectedRecordIds: number[];
+
+  constructor(
+    private listService: ListService,
+    private domSanitizer: DomSanitizer
+  ) { }
 
   ngOnInit() {
     this.fileName = '';
@@ -36,11 +47,31 @@ export class ListComponent implements OnInit {
     this.pageSize = 10;
     this.currentCounts = 0;
     this.iframeSrc = '';
+    this.downloadSrc = '';
     this.apiUrl = environment.baseUrl + '/helperfiles/download?id=';
+    this.selectedRecordIds = [];
+    this.records = [];
 
     this.listService.getAllRecords().subscribe(res => {
-      this.records = res['data'];
-    });
+        JSON.parse(res['_body']).forEach(item => {
+          const obj: any = new Object();
+          const origin: any = item['fileStoreList'][0];
+          obj['id'] = item.id;
+          obj['downloadId'] = origin.id;
+          obj['fileName'] = item.name;
+          obj['filePath'] = origin.filePath;
+          obj['fileType'] = origin.fileType;
+          obj['fileSize'] = origin.fileSize;
+          obj['clickCount'] = origin.clickCount;
+          obj['downloadCount'] = origin.downloadCount;
+          obj['uploadTime'] = origin.uploadTime;
+          this.records.push(obj);
+        });
+        this.sum = this.records.length;
+        this.currentCounts = this.sum % this.pageSize;
+      }, err => {
+        console.log(err);
+      });
   }
 
   onFilesChange(event: any): void {
@@ -48,11 +79,12 @@ export class ListComponent implements OnInit {
   }
 
   upload(): void {
-    console.log(this.files, this.fileName, this.helpType);
     this.listService.upload(this.files, this.fileName, this.helpType).subscribe(res => {
-      console.log(res);
+      this.showUploadPopup = false;
+      alert('上传成功');
+      // window.location.reload();
     }, err => {
-      throw err;
+      console.log(err);
     });
   }
 
@@ -74,19 +106,40 @@ export class ListComponent implements OnInit {
 
   showScanWindow(id: number): void {
     this.showScanPopup = true;
-    this.iframeSrc = this.apiUrl + id;
+    this.iframeSrc = this.domSanitizer.bypassSecurityTrustResourceUrl(
+      environment.baseUrl + '/file/store/' + id + '?type='
+    );
+    this.downloadSrc = environment.baseUrl + '/file/store/' + id + '?type=download';
   }
 
   hideScanWindow(): void {
     this.showScanPopup = false;
   }
 
+  addSelectedRecord(event: any, id: number): void {
+    if (event.target.checked) {
+      this.selectedRecordIds.push(id);
+    } else {
+      const index: number = this.selectedRecordIds.indexOf(id);
+      this.selectedRecordIds.splice(index, 1);
+    }
+  }
+
   delete(id: number): void {
-    this.listService.deleteRecord(id).subscribe(res => {
-      alert('文件删除成功');
-    }, err => {
-      throw err;
-    });
+    if (!id) {
+      const idStr: string = this.selectedRecordIds.join(',');
+      this.listService.deleteRecord(idStr).subscribe(res => {
+        alert('文件删除成功');
+        window.location.reload();
+      });
+    } else {
+      this.listService.deleteRecord(id).subscribe(res => {
+        alert('文件删除成功');
+        window.location.reload();
+      }, err => {
+        throw err;
+      });
+    }
   }
 
 }

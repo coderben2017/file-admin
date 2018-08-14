@@ -26,18 +26,22 @@
   </div>
 
   <div class="container-popup pdf" *ngIf="showScanPopup">
+    <a [href]="downloadSrc" class="pull-left btn btn-info btn-sm">下载此文档</a>
     <span class="pull-right" (click)="hideScanWindow()">×</span>
     <iframe [src]="iframeSrc"></iframe>
   </div>
   
 
   <div class="row">
-    <nav class="navbar navbar-light col-sm-12">
+    <nav class="navbar navbar-light nav-header">
       <form class="form-inline">
         <input class="form-control mr-sm-2" type="text" placeholder="请输入文件名" />
-        <button class="btn btn-primary mr-sm-2">查找</button>
+        <button class="btn btn-primary">查找</button>
       </form>
-      <button class="btn btn-primary" (click)="showPopupWindow()">上传文件</button>
+      <div>
+        <button class="btn btn-primary" (click)="delete()">删除选中</button>
+        <button class="btn btn-primary" (click)="showPopupWindow()">上传文档</button>
+      </div>
     </nav>
   </div>
   
@@ -45,24 +49,28 @@
     <thead>
       <tr>
         <th style="width: 5px"></th>
+        <th>ID</th>
         <th>名称</th>
         <th>格式</th>
-        <th>大小（M）</th>
-        <th>路径</th>
-        <th>类型</th>
+        <th>大小（KB）</th>
+        <th>点击数</th>
+        <th>下载数</th>
+        <th>上传时间</th>
         <th style="width: 100px">操作</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let record of records">
-        <td><input type="checkbox" class="input-checkbox" /></td>
+        <td><input type="checkbox" class="input-checkbox" (change)="addSelectedRecord($event,record.id)"/></td>
+        <td>{{record.id}}</td>
         <td>{{record.fileName}}</td>
         <td>{{record.fileType}}</td>
-        <td>{{record.fileSize}}</td>
-        <td>{{record.filePath}}</td>
-        <td>{{record.helpType}}</td>
+        <td>{{record.fileSize / 8192 | number: '1.0-2'}}</td>
+        <td>{{record.clickCount}}</td>
+        <td>{{record.downloadCount}}</td>
+        <td>{{record.uploadTime}}</td>
         <td>
-          <a href="javascript:;" (click)="showScanWindow(record.id)">预览</a>
+          <a href="javascript:;" (click)="showScanWindow(record.downloadId)">预览</a>
           <a href="javascript:;" (click)="delete(record.id)">删除</a>
         </td>
       </tr>

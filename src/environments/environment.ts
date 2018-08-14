@@ -5,5 +5,5 @@
 
 export const environment = {
   production: false,
-  baseUrl: 'http://47.93.193.33:3001'
+  baseUrl: 'http://node1.dev.liqiang:1201/service-cutover'
 };
